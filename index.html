@@ -4,7 +4,217 @@
     <meta charset="UTF-8">
     <title>New-Eden</title>
     <style>
-        body { background: #0b0e14; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; }
+        body { background: #0b0e14; color:<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New-Eden | Space Command</title>
+    <style>
+        /* Basierend auf den extrahierten Farben aus deinem Code */
+        :root {
+            --bg-dark: #021114;      /* Hintergrundfarbe aus Quellcode */
+            --cyan-glow: #7efcf6;    /* Primäre Akzentfarbe */
+            --orange-highlight: #ffa76c; /* Akzent für Buttons/Wichtiges */
+            --border-color: #0b8481; /* Rahmenfarbe für Tabellen/Boxen */
+            --text-gray: #757b83;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Animierter Hintergrund-Wrapper */
+        .bg-wrapper {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #052f37 0%, #021114 100%);
+            z-index: -1;
+        }
+
+        /* Header mit Ressourcen */
+        .header-bar {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(62, 251, 251, 0.05);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .resource-box {
+            text-align: center;
+        }
+
+        .res-label {
+            color: var(--cyan-glow);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            display: block;
+        }
+
+        .res-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        /* Main UI Container */
+        .game-container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        /* Sci-Fi Cards (inspiriert von Arwes-Design aus deinem Code) */
+        .building-card {
+            background: rgba(62, 251, 251, 0.05);
+            border-left: 3px solid var(--cyan-glow);
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .building-card:hover {
+            background: rgba(62, 251, 251, 0.1);
+            box-shadow: 0 0 15px rgba(126, 252, 246, 0.2);
+        }
+
+        .building-title {
+            color: var(--orange-highlight);
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stats {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        /* Button-Design aus deinem Quellcode */
+        button {
+            background-color: transparent;
+            color: var(--cyan-glow);
+            border: 1px solid var(--cyan-glow);
+            padding: 10px 25px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+            float: right;
+            transition: 0.3s;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: var(--cyan-glow);
+            color: var(--bg-dark);
+            box-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        button:disabled {
+            border-color: #333;
+            color: #333;
+            cursor: not-allowed;
+        }
+
+        #log {
+            font-family: monospace;
+            color: var(--cyan-glow);
+            margin-top: 50px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-wrapper"></div>
+
+<div class="header-bar">
+    <div class="resource-box">
+        <span class="res-label">Metall</span>
+        <span id="metal" class="res-value">500</span>
+    </div>
+    <div class="resource-box">
+        <span class="res-label">Kristall</span>
+        <span id="crystal" class="res-value">300</span>
+    </div>
+    <div class="resource-box">
+        <span class="res-label">Energie</span>
+        <span id="energy" class="res-value" style="color: #6fff00;">15/20</span>
+    </div>
+</div>
+
+<div class="game-container">
+    <h1 style="color: var(--cyan-glow); text-align: center; letter-spacing: 5px;">NEW-EDEN</h1>
+    
+    <div class="building-card">
+        <button id="upgrade-btn" onclick="upgradeMine()">Ausbauen</button>
+        <h3 class="building-title">Metallmine (Stufe <span id="mine-lvl">1</span>)</h3>
+        <div class="stats">
+            Kosten: <span id="mine-cost" style="color: var(--orange-highlight);">100</span> Metall<br>
+            Produktion: +<span id="mine-prod">12</span> / Std
+        </div>
+    </div>
+
+    <div id="log">Konsole: System bereit...</div>
+</div>
+
+<script>
+    // Spiel-Daten (State)
+    let state = {
+        metal: 500,
+        crystal: 300,
+        mineLvl: 1,
+        mineCost: 100,
+        production: 12
+    };
+
+    // UI-Aktualisierung
+    function updateUI() {
+        document.getElementById('metal').innerText = Math.floor(state.metal);
+        document.getElementById('mine-lvl').innerText = state.mineLvl;
+        document.getElementById('mine-cost').innerText = state.mineCost;
+        document.getElementById('mine-prod').innerText = state.production;
+        
+        // Button deaktivieren wenn zu wenig Ressourcen
+        document.getElementById('upgrade-btn').disabled = (state.metal < state.mineCost);
+    }
+
+    // Ticker (Ressourcen steigen kontinuierlich)
+    setInterval(() => {
+        state.metal += (state.production / 3600); // Produktion pro Sekunde
+        updateUI();
+    }, 1000);
+
+    function upgradeMine() {
+        if (state.metal >= state.mineCost) {
+            state.metal -= state.mineCost;
+            state.mineLvl++;
+            state.production = Math.floor(state.production * 1.6);
+            state.mineCost = Math.floor(state.mineCost * 1.5);
+            
+            log("LOG: Metallmine auf Stufe " + state.mineLvl + " erweitert.");
+            updateUI();
+        }
+    }
+
+    function log(msg) {
+        document.getElementById('log').innerText = msg;
+    }
+
+    // Initialer Aufruf
+    updateUI();
+</script>
+
+</body>
+</html> #e0e0e0; font-family: 'Segoe UI', sans-serif; }
         .container { width: 800px; margin: 50px auto; background: #161b22; padding: 20px; border-radius: 8px; border: 1px solid #30363d; }
         .res-bar { display: flex; justify-content: space-around; background: #0d1117; padding: 10px; border-bottom: 2px solid #238636; }
         .resource { font-weight: bold; color: #58a6ff; }
