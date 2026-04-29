@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Space Dawn Clone</title>
+    <style>
+        body { background: #0b0e14; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; }
+        .container { width: 800px; margin: 50px auto; background: #161b22; padding: 20px; border-radius: 8px; border: 1px solid #30363d; }
+        .res-bar { display: flex; justify-content: space-around; background: #0d1117; padding: 10px; border-bottom: 2px solid #238636; }
+        .resource { font-weight: bold; color: #58a6ff; }
+        .building-card { background: #21262d; border: 1px solid #30363d; padding: 15px; margin-top: 20px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
+        button { background: #238636; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; }
+        button:disabled { background: #30363d; cursor: not-allowed; }
+        button:hover:not(:disabled) { background: #2ea043; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Universe Dawn: Lite</h1>
+    
+    <div class="res-bar">
+        <div>Metall: <span id="metal" class="resource">500</span></div>
+        <div>Kristall: <span id="crystal" class="resource">300</span></div>
+    </div>
+
+    <div class="building-card">
+        <div>
+            <h3>Metallmine (Stufe <span id="mine-lvl">1</span>)</h3>
+            <p>Kosten: <span id="mine-cost">100</span> Metall</p>
+            <small>Produktion: +<span id="mine-prod">10</span>/sek</small>
+        </div>
+        <button onclick="upgradeMine()">Ausbauen</button>
+    </div>
+
+    <div id="log" style="margin-top: 20px; color: #8b949e; font-size: 0.9em;"></div>
+</div>
+
+<script>
+    // Spiel-Daten
+    let state = {
+        metal: 500,
+        crystal: 300,
+        mineLvl: 1,
+        mineCost: 100,
+        production: 10
+    };
+
+    // UI Elemente
+    const metalEl = document.getElementById('metal');
+    const mineLvlEl = document.getElementById('mine-lvl');
+    const mineCostEl = document.getElementById('mine-cost');
+    const mineProdEl = document.getElementById('mine-prod');
+
+    // Ticker (läuft jede Sekunde)
+    setInterval(() => {
+        state.metal += state.production / 10; // Update alle 100ms für flüssige Anzeige
+        updateUI();
+    }, 100);
+
+    function upgradeMine() {
+        if (state.metal >= state.mineCost) {
+            state.metal -= state.mineCost;
+            state.mineLvl++;
+            state.production += 15;
+            state.mineCost = Math.floor(state.mineCost * 1.5);
+            
+            log("Metallmine auf Stufe " + state.mineLvl + " ausgebaut!");
+            updateUI();
+        } else {
+            alert("Nicht genug Metall!");
+        }
+    }
+
+    function updateUI() {
+        metalEl.innerText = Math.floor(state.metal);
+        mineLvlEl.innerText = state.mineLvl;
+        mineCostEl.innerText = state.mineCost;
+        mineProdEl.innerText = state.production;
+    }
+
+    function log(msg) {
+        document.getElementById('log').innerText = msg;
+    }
+</script>
+
+</body>
+</html>
